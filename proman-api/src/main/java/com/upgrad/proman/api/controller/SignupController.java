@@ -33,6 +33,7 @@ public class SignupController {
         userEntity.setLastName(signupUserRequest.getLastName());
         userEntity.setEmail(signupUserRequest.getEmailAddress());
         userEntity.setPassword(signupUserRequest.getPassword());
+        userEntity.setMobilePhone(signupUserRequest.getMobileNumber());
         userEntity.setSalt("12345hysgt");
         userEntity.setStatus(4);
         userEntity.setCreatedAt(ZonedDateTime.now());

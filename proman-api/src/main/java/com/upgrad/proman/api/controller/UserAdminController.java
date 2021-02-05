@@ -1,13 +1,16 @@
 package com.upgrad.proman.api.controller;
 
-import com.upgrad.proman.api.model.SignupUserResponse;
 import com.upgrad.proman.api.model.UserDetailsResponse;
-import com.upgrad.proman.service.business.UserBusinessService;
+import com.upgrad.proman.api.model.UserStatusType;
+import com.upgrad.proman.service.business.UserAdminBusinessService;
 import com.upgrad.proman.service.entity.UserEntity;
+import com.upgrad.proman.service.exception.ResourceNotFoundException;
+import com.upgrad.proman.service.type.UserStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,14 +20,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserAdminController {
 
     @Autowired
-    private UserBusinessService businessService;
+    private UserAdminBusinessService businessService;
 
-    @RequestMapping(method= RequestMethod.POST, path="/uuid", consumes= MediaType.APPLICATION_JSON_UTF8_VALUE, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UserDetailsResponse> getUser(final String userUuid) {
+    @RequestMapping(method= RequestMethod.POST, path="/users/{id}", consumes= MediaType.APPLICATION_JSON_UTF8_VALUE, produces=MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<UserDetailsResponse> getUser(@PathVariable("id") final String userUuid) throws ResourceNotFoundException {
         final UserEntity userEntity = businessService.getUser(userUuid);
 
-        UserDetailsResponse userDetailsResponse = new UserDetailsResponse().id(userEntity.getUuid()).emailAddress(userEntity.getEmail()).firstName(userEntity.getFirstName())
-                .lastName(userEntity.getLastName()).mobileNumber(userEntity.getMobilePhone());
-        return new ResponseEntity<UserDetailsResponse>(userDetailsResponse,HttpStatus.CREATED);
+        UserDetailsResponse userDetailsResponse = new UserDetailsResponse().id(userEntity.getUuid())
+                .emailAddress(userEntity.getEmail()).firstName(userEntity.getFirstName())
+                .lastName(userEntity.getLastName()).mobileNumber(userEntity.getMobilePhone())
+                .status(UserStatusType.valueOf(UserStatus.getEnum(userEntity.getStatus()).name()));
+        return new ResponseEntity<UserDetailsResponse>(userDetailsResponse,HttpStatus.OK);
     }
 }
